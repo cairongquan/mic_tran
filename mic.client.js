@@ -1,5 +1,5 @@
-const fs = require('fs')
-const mic = require('mic')
+const fs = require('fs');
+const mic = require('mic');
 
 module.exports = class Mic {
   constructor() {
@@ -9,36 +9,40 @@ module.exports = class Mic {
       debug: false,
       exitOnSilence: 6,
       fileType: 'wav'
-    }
-    this.micInstance = mic(this.config)
+    };
     this.micInputStream = null;
     this.outputFileStream = null;
   }
 
   start(filePath) {
+    this.micInstance = mic(this.config);
     return new Promise(resolve => {
+      this.micInputStream = null
+      this.outputFileStream = null
+
       this.micInputStream = this.micInstance.getAudioStream();
-      this.outputFileStream = fs.createWriteStream(filePath);
+      this.outputFileStream = fs.createWriteStream(filePath).on('close', () => {
+        // console.log('pipeClose')
+      }).on('pipe', () => {
+        // console.log('pipePipe')
+      }).on('ready', () => {
+        // console.log('pipeReady')
+        resolve();
+      }).on('error', (error) => {
+        console.log(error)
+      })
       this.micInputStream.pipe(this.outputFileStream);
       this.micInstance.start();
-      let timer = setTimeout(() => {
-        timer = null
-        resolve();
-      }, 100);
-    })
+    });
   }
 
   stop() {
     return new Promise(resolve => {
+      this.micInputStream.unpipe(this.outputFileStream)
       this.micInstance.stop();
-      this.micInputStream.on('stopComplete', () => {
-        this.micInputStream.unpipe(this.outputFileStream);
-        this.outputFileStream = null;
-        let timer = setTimeout(() => {
-          timer = null
-          resolve();
-        }, 100);
-      });
+      this.outputFileStream.end();
+      this.micInputStream.removeAllListeners()
+      resolve();
     });
   }
-}
+};
