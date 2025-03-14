@@ -13,12 +13,14 @@ const rl = readline.createInterface({
 rl.input.on('keypress', (str, key) => {
   switch (key.name) {
     case 'a':
-      console.log(chalk.green('开始录音...'));
-      micClient.start('output.wav');
+      micClient.start('output.wav').then(() => {
+        console.log(chalk.green('开始录音...'));
+      });
       break;
     case 's':
-      console.log(chalk.red('结束录音...'));
-      micClient.stop();
+      micClient.stop().then(() => {
+        console.log(chalk.red('结束录音...'));
+      });
       break;
     default:
       break;

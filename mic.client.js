@@ -16,10 +16,16 @@ module.exports = class Mic {
   }
 
   start(filePath) {
-    this.micInputStream = this.micInstance.getAudioStream();
-    this.outputFileStream = fs.createWriteStream(filePath);
-    this.micInputStream.pipe(this.outputFileStream);
-    this.micInstance.start();
+    return new Promise(resolve => {
+      this.micInputStream = this.micInstance.getAudioStream();
+      this.outputFileStream = fs.createWriteStream(filePath);
+      this.micInputStream.pipe(this.outputFileStream);
+      this.micInstance.start();
+      let timer = setTimeout(() => {
+        timer = null
+        resolve();
+      }, 100);
+    })
   }
 
   stop() {
@@ -28,7 +34,10 @@ module.exports = class Mic {
       this.micInputStream.on('stopComplete', () => {
         this.micInputStream.unpipe(this.outputFileStream);
         this.outputFileStream = null;
-        resolve();
+        let timer = setTimeout(() => {
+          timer = null
+          resolve();
+        }, 100);
       });
     });
   }
