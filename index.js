@@ -48,13 +48,15 @@ rl.input.on('keypress', (str, key) => {
         currentObj.tranText = needTransName[count]
         currentObj.count = count
         currentObj.tranFilePath = currentPath
+        const stats = fs.statSync(currentPath);
+        console.log(`文件大小: ${stats.size / 1024} kb`);
         fs.writeFileSync('./readCount.json', JSON.stringify(currentObj))
         let currentText = fs.readFileSync('./TRANS.txt', 'utf-8')
         currentText += `${currentPath.split('/').at(-1)}\t 10_201031 \t ${currentObj.tranText}\n`
         fs.writeFileSync('./TRANS.txt', currentText)
         count++
-        console.log(chalk.red('结束录音'));
         console.timeEnd('录音时长');
+        console.log(chalk.red('结束录音'));
       });
       break;
     default:
