@@ -1,6 +1,7 @@
 const fs = require('fs');
 const mic = require('mic');
 
+
 module.exports = class Mic {
   constructor() {
     this.config = {

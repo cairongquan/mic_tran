@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-
+10_201031
 
 # local env files
 .env.local
